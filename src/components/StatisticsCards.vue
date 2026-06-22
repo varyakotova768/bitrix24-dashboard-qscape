@@ -1,6 +1,5 @@
 <template>
   <div class="statistics-cards">
-<!--     Карточка: Сотрудников -->
     <div class="stat-card">
       <div class="stat-card-row">
         <span class="stat-label">Сотрудников</span>
@@ -13,7 +12,6 @@
       </div>
     </div>
 
-<!--     Карточка: Перегружены -->
     <div class="stat-card stat-card-red">
       <div class="stat-card-row">
         <span class="stat-label">Перегружены</span>
@@ -26,7 +24,6 @@
       </div>
     </div>
 
-<!--     Карточка: Свободны -->
     <div class="stat-card stat-card-green">
       <div class="stat-card-row">
         <span class="stat-label">Свободны</span>
@@ -39,7 +36,6 @@
       </div>
     </div>
 
-<!--     Карточка: Задач всего -->
     <div class="stat-card">
       <div class="stat-card-row">
         <span class="stat-label">Задач всего</span>
@@ -52,7 +48,6 @@
       </div>
     </div>
 
-<!--     Карточка: Задач закрыто -->
     <div class="stat-card">
       <div class="stat-card-row">
         <span class="stat-label">Задач закрыто</span>
@@ -68,7 +63,6 @@
 </template>
 
 <script setup>
-// Пропсы: объект со статистикой
 defineProps({
   stats: { type: Object, required: true }
 })
@@ -79,6 +73,7 @@ defineProps({
   display: flex;
   gap: 2.1%;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .stat-card {
@@ -89,11 +84,16 @@ defineProps({
   background: #F5F4ED;
   border-radius: 10px;
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
 }
 
-.stat-card-red { background: #FAECE7; }
-.stat-card-green { background: #EAF3DE; }
+.stat-card-red { 
+  background: #FAECE7; 
+}
+
+.stat-card-green { 
+  background: #EAF3DE; 
+}
 
 .stat-card-row {
   display: flex;
@@ -123,8 +123,13 @@ defineProps({
   color: #000000;
 }
 
-.stat-card-red .stat-number { color: #E24B4A; }
-.stat-card-green .stat-number { color: #416517; }
+.stat-card-red .stat-number { 
+  color: #E24B4A; 
+}
+
+.stat-card-green .stat-number { 
+  color: #416517; 
+}
 
 .stat-unit {
   font-family: 'Inter', sans-serif;
@@ -132,5 +137,39 @@ defineProps({
   font-size: 14px;
   line-height: 17px;
   color: #000000;
+}
+
+@media (max-width: 992px) {
+  .statistics-cards {
+    gap: 12px;
+  }
+  
+  .stat-card {
+    min-width: calc(50% - 6px);
+    flex: 0 0 calc(50% - 6px);
+  }
+  
+  .stat-number {
+    font-size: 32px;
+    line-height: 38px;
+  }
+  
+  .stat-label {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    min-width: 100%;
+    flex: 0 0 100%;
+    padding: 12px 16px;
+  }
+  
+  .stat-number {
+    font-size: 28px;
+    line-height: 34px;
+  }
 }
 </style>

@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency directories
 node_modules
 .DS_Store
 dist
@@ -37,10 +38,3 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
-
-# Environment variables (ДОБАВИТЬ ЭТИ СТРОКИ)
-.env
-.env.local
-.env.*.local
-.env.production
-.env.development
