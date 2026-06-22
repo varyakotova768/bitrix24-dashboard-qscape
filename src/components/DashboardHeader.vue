@@ -1,15 +1,13 @@
 <template>
   <div class="dashboard-header">
-<!--     Заголовок -->
     <div class="header-title-block">
       <h1 class="header-title">Загруженность команды</h1>
     </div>
-<!--     Блок синхронизации -->
     <div class="header-sync-block">
       <span class="last-update">Последнее обновление: {{ formattedTime }}</span>
-      <button class="sync-button" @click="$emit('sync')">
-        <span class="sync-text">Синхронизировать</span>
-        <span class="sync-icon">⟳</span>
+      <button class="sync-button" :disabled="isLoading" @click="$emit('sync')">
+        <span class="sync-text">{{ isLoading ? 'Загрузка...' : 'Синхронизировать' }}</span>
+        <span class="sync-icon" :class="{ 'rotating': isLoading }">⟳</span>
       </button>
     </div>
   </div>
@@ -18,15 +16,13 @@
 <script setup>
 import { computed } from 'vue'
 
-// Пропсы: время последнего обновления
 const props = defineProps({
-  lastUpdate: { type: Date, default: () => new Date() }
+  lastUpdate: { type: Date, default: () => new Date() },
+  isLoading: { type: Boolean, default: false }
 })
 
-// Событие: синхронизация
 defineEmits(['sync'])
 
-// Форматирование времени
 const formattedTime = computed(() => {
   const d = props.lastUpdate
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
@@ -39,6 +35,8 @@ const formattedTime = computed(() => {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .header-title {
@@ -47,12 +45,14 @@ const formattedTime = computed(() => {
   font-size: 36px;
   line-height: 44px;
   color: #000000;
+  margin: 0;
 }
 
 .header-sync-block {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .last-update {
@@ -75,8 +75,13 @@ const formattedTime = computed(() => {
   transition: 0.2s;
 }
 
-.sync-button:hover {
+.sync-button:hover:not(:disabled) {
   background: #e9e8e0;
+}
+
+.sync-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .sync-text {
@@ -88,6 +93,47 @@ const formattedTime = computed(() => {
 }
 
 .sync-icon {
-  font-size: 16px;
+  font-size: 18px;
+  display: inline-block;
+}
+
+.rotating {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .header-title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  
+  .last-update {
+    font-size: 14px;
+  }
+  
+  .sync-text {
+    font-size: 14px;
+  }
+  
+  .header-sync-block {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  
+  .sync-button {
+    padding: 4px 8px;
+  }
 }
 </style>

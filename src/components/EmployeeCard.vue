@@ -1,27 +1,24 @@
 <template>
   <div class="employee-card">
-<!--     Основная информация -->
     <div class="employee-main">
       <div class="employee-info">
-        <div class="employee-avatar" :style="{ backgroundImage: `url(${employee.avatar})` }"></div>
+        <div class="employee-avatar" :style="avatarStyle"></div>
         <div class="employee-details">
           <div class="employee-name">{{ employee.name }}</div>
           <div class="employee-position">{{ employee.position }}</div>
         </div>
       </div>
 
-<!--       Список задач сотрудника -->
       <div class="employee-tasks">
         <TaskBadge
-            v-for="task in employee.tasks"
-            :key="task.id"
-            :task="task"
+          v-for="task in employee.tasks"
+          :key="task.id"
+          :task="task"
         />
-        <div v-if="employee.tasks.length === 0" class="no-tasks">Нет активных задач</div>
+        <div v-if="!employee.tasks || employee.tasks.length === 0" class="no-tasks">Нет активных задач</div>
       </div>
     </div>
 
-<!--     Боковая панель: загруженность + Битрикс24 -->
     <div class="employee-sidebar">
       <div class="workload-indicator" :class="workloadClass">
         <span class="workload-label">Запланировано</span>
@@ -43,20 +40,23 @@
 import { computed } from 'vue'
 import TaskBadge from './TaskBadge.vue'
 
-// Пропсы: данные сотрудника
 const props = defineProps({
   employee: { type: Object, required: true }
 })
 
-// Событие: открыть Битрикс24
 defineEmits(['openBitrix'])
 
-// Класс загруженности в зависимости от статуса
 const workloadClass = computed(() => {
   switch (props.employee.loadStatus) {
     case 'overload': return 'workload-overload'
     case 'free': return 'workload-free'
     default: return 'workload-normal'
+  }
+})
+
+const avatarStyle = computed(() => {
+  if (props.employee.avatar) {
+    return { backgroundImage: `url(${props.employee.avatar})` }
   }
 })
 </script>
@@ -70,6 +70,7 @@ const workloadClass = computed(() => {
   background: #FFFFFF;
   border: 1px solid #D5D4CE;
   border-radius: 10px;
+  flex-wrap: wrap;
 }
 
 .employee-main {
@@ -194,5 +195,69 @@ const workloadClass = computed(() => {
 
 .bitrix-icon {
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .employee-card {
+    padding: 12px;
+  }
+  
+  .employee-name {
+    font-size: 17px;
+    line-height: 20px;
+  }
+  
+  .employee-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .employee-sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .workload-hours {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .employee-card {
+    padding: 10px;
+  }
+  
+  .employee-info {
+    gap: 8px;
+  }
+  
+  .employee-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .employee-name {
+    font-size: 15px;
+    line-height: 18px;
+  }
+  
+  .employee-position {
+    font-size: 12px;
+    line-height: 15px;
+  }
+  
+  .workload-indicator {
+    padding: 4px 6px;
+  }
+  
+  .workload-label {
+    font-size: 12px;
+  }
+  
+  .workload-hours {
+    font-size: 15px;
+  }
 }
 </style>

@@ -1,17 +1,18 @@
 <template>
   <div class="statistics-sidebar">
-<!--     Блок распределения по команде -->
-    <div class="distribution-block">
-      <h3 class="sidebar-title">Распределение по команде</h3>
+    <div v-if="isLoading" class="loading-placeholder">
+      <div class="loading-spinner"></div>
+      <span>Загрузка данных...</span>
+    </div>
+    
+    <template v-else>
+      <div class="distribution-block">
+        <h3 class="sidebar-title">Распределение по команде</h3>
 
-<!--       Кольцевая диаграмма -->
-      <div class="pie-chart">
-        <svg width="180" height="180" viewBox="0 0 40 40">
-<!--           Фоновый круг -->
-          <circle cx="20" cy="20" r="16" fill="none" stroke="#F5F4ED" stroke-width="6"/>
-
-<!--           Перегружены (красный) -->
-          <circle
+        <div class="pie-chart">
+          <svg width="180" height="180" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" fill="none" stroke="#F5F4ED" stroke-width="6"/>
+            <circle
               cx="20" cy="20" r="16"
               fill="none"
               stroke="#E24B4A"
@@ -19,10 +20,8 @@
               :stroke-dasharray="overloadDasharray"
               stroke-dashoffset="0"
               transform="rotate(-90 20 20)"
-          />
-
-<!--           Норма (фиолетовый) -->
-          <circle
+            />
+            <circle
               cx="20" cy="20" r="16"
               fill="none"
               stroke="#3C3489"
@@ -30,10 +29,8 @@
               :stroke-dasharray="normalDasharray"
               :stroke-dashoffset="normalDashoffset"
               transform="rotate(-90 20 20)"
-          />
-
-<!--           Свободны (зелёный) -->
-          <circle
+            />
+            <circle
               cx="20" cy="20" r="16"
               fill="none"
               stroke="#416517"
@@ -41,43 +38,40 @@
               :stroke-dasharray="freeDasharray"
               :stroke-dashoffset="freeDashoffset"
               transform="rotate(-90 20 20)"
-          />
-
-<!--           Центральный белый круг -->
-          <circle cx="20" cy="20" r="11" fill="white"/>
-        </svg>
-      </div>
-
-<!--       Легенда -->
-      <div class="distribution-legend">
-        <div class="legend-item">
-          <div class="legend-color" style="background: #E24B4A"></div>
-          <span class="legend-text">Перегружены — {{ distribution.overload }}</span>
+            />
+            <circle cx="20" cy="20" r="11" fill="white"/>
+          </svg>
         </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: #3C3489"></div>
-          <span class="legend-text">Норма — {{ distribution.normal }}</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: #416517"></div>
-          <span class="legend-text">Свободны — {{ distribution.free }}</span>
+
+        <div class="distribution-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #E24B4A"></div>
+            <span class="legend-text">Перегружены — {{ distribution.overload }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #3C3489"></div>
+            <span class="legend-text">Норма — {{ distribution.normal }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #416517"></div>
+            <span class="legend-text">Свободны — {{ distribution.free }}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <hr class="sidebar-divider" />
+      <hr class="sidebar-divider" />
 
-<!--     Блок статусов задач -->
-    <div class="task-status-block">
-      <h3 class="sidebar-title">Статусы задач</h3>
-      <div class="task-status-list">
-        <StatusBadge
+      <div class="task-status-block">
+        <h3 class="sidebar-title">Статусы задач</h3>
+        <div class="task-status-list">
+          <StatusBadge
             v-for="status in taskStatuses"
             :key="status.type"
             :status="status"
-        />
+          />
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -85,21 +79,18 @@
 import StatusBadge from './StatusBadge.vue'
 import { computed } from 'vue'
 
-// Пропсы: распределение и статусы задач
 const props = defineProps({
   distribution: { type: Object, required: true },
-  taskStatuses: { type: Array, required: true }
+  taskStatuses: { type: Array, required: true },
+  isLoading: { type: Boolean, default: false }
 })
 
-// Общее количество сотрудников
 const totalEmployees = computed(() => {
   return props.distribution.overload + props.distribution.normal + props.distribution.free
 })
 
-// Длина окружности
 const CIRCUMFERENCE = 100.53
 
-// Dasharray для сегмента "Перегружены"
 const overloadDasharray = computed(() => {
   if (totalEmployees.value === 0) return '0 100.53'
   const percent = props.distribution.overload / totalEmployees.value
@@ -107,7 +98,6 @@ const overloadDasharray = computed(() => {
   return `${length} ${CIRCUMFERENCE}`
 })
 
-// Dasharray для сегмента "Норма"
 const normalDasharray = computed(() => {
   if (totalEmployees.value === 0) return '0 100.53'
   const percent = props.distribution.normal / totalEmployees.value
@@ -115,7 +105,6 @@ const normalDasharray = computed(() => {
   return `${length} ${CIRCUMFERENCE}`
 })
 
-// Dasharray для сегмента "Свободны"
 const freeDasharray = computed(() => {
   if (totalEmployees.value === 0) return '0 100.53'
   const percent = props.distribution.free / totalEmployees.value
@@ -123,14 +112,12 @@ const freeDasharray = computed(() => {
   return `${length} ${CIRCUMFERENCE}`
 })
 
-// Смещение для сегмента "Норма" (после перегруженных)
 const normalDashoffset = computed(() => {
   if (totalEmployees.value === 0) return 0
   const overloadPercent = props.distribution.overload / totalEmployees.value
   return -(CIRCUMFERENCE * overloadPercent)
 })
 
-// Смещение для сегмента "Свободны" (после перегруженных + норма)
 const freeDashoffset = computed(() => {
   if (totalEmployees.value === 0) return 0
   const overloadPercent = props.distribution.overload / totalEmployees.value
@@ -152,6 +139,30 @@ const freeDashoffset = computed(() => {
   border-radius: 10px;
 }
 
+.loading-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 12px;
+  color: #666;
+  min-height: 300px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #ddd;
+  border-top-color: #3D3D3A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .distribution-block {
   display: flex;
   flex-direction: column;
@@ -165,6 +176,7 @@ const freeDashoffset = computed(() => {
   font-size: 20px;
   line-height: 24px;
   color: #141413;
+  margin: 0;
 }
 
 .pie-chart {
@@ -213,5 +225,67 @@ const freeDashoffset = computed(() => {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 12px;
+}
+
+@media (max-width: 1200px) {
+  .statistics-sidebar {
+    width: 35%;
+  }
+}
+
+@media (max-width: 992px) {
+  .statistics-sidebar {
+    width: 100%;
+    padding: 16px;
+  }
+  
+  .pie-chart svg {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+@media (max-width: 768px) {
+  .statistics-sidebar {
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .sidebar-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+  
+  .legend-text {
+    font-size: 14px;
+    line-height: 17px;
+  }
+  
+  .pie-chart svg {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-sidebar {
+    padding: 10px;
+    gap: 12px;
+  }
+  
+  .pie-chart svg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .sidebar-title {
+    font-size: 16px;
+    line-height: 20px;
+  }
+  
+  .legend-text {
+    font-size: 13px;
+    line-height: 16px;
+  }
 }
 </style>

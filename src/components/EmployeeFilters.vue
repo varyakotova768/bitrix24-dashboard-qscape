@@ -1,69 +1,64 @@
 <template>
   <div class="employee-filters">
-<!--     Вкладки -->
     <div class="filter-tabs">
       <div
-          class="filter-tab"
-          :class="{ active: activeTab === 'employees' }"
-          @click="$emit('update:activeTab', 'employees')"
+        class="filter-tab"
+        :class="{ active: activeTab === 'employees', disabled: isLoading }"
+        @click="!isLoading && $emit('update:activeTab', 'employees')"
       >
         <span class="filter-tab-text">Сотрудники</span>
       </div>
       <div
-          class="filter-tab"
-          :class="{ active: activeTab === 'tasks' }"
-          @click="$emit('update:activeTab', 'tasks')"
+        class="filter-tab"
+        :class="{ active: activeTab === 'tasks', disabled: isLoading }"
+        @click="!isLoading && $emit('update:activeTab', 'tasks')"
       >
         <span class="filter-tab-text">Задачи</span>
       </div>
     </div>
 
-<!--     Контент для вкладки "Сотрудники" -->
     <div v-if="activeTab === 'employees'" class="tab-content">
-      <!-- Фильтр по периоду -->
       <div class="period-filters">
         <div
-            class="period-chip"
-            :class="{ active: periodFilter === 'today' }"
-            @click="setPeriod('today')"
+          class="period-chip"
+          :class="{ active: periodFilter === 'today' }"
+          @click="setPeriod('today')"
         >Сегодня</div>
         <div
-            class="period-chip"
-            :class="{ active: periodFilter === 'week' }"
-            @click="setPeriod('week')"
+          class="period-chip"
+          :class="{ active: periodFilter === 'week' }"
+          @click="setPeriod('week')"
         >Неделя</div>
         <div
-            class="period-chip"
-            :class="{ active: periodFilter === 'month' }"
-            @click="setPeriod('month')"
+          class="period-chip"
+          :class="{ active: periodFilter === 'month' }"
+          @click="setPeriod('month')"
         >Месяц</div>
       </div>
 
-<!--       Фильтр по загруженности -->
       <div class="workload-filters">
         <div
-            class="workload-chip"
-            :class="{ active: workloadFilter === 'all' }"
-            @click="$emit('update:workloadFilter', 'all')"
+          class="workload-chip"
+          :class="{ active: workloadFilter === 'all' }"
+          @click="!isLoading && $emit('update:workloadFilter', 'all')"
         >Все</div>
         <div
-            class="workload-chip"
-            :class="{ active: workloadFilter === 'overload' }"
-            @click="$emit('update:workloadFilter', 'overload')"
+          class="workload-chip"
+          :class="{ active: workloadFilter === 'overload' }"
+          @click="!isLoading && $emit('update:workloadFilter', 'overload')"
         >Перегружены</div>
         <div
-            class="workload-chip"
-            :class="{ active: workloadFilter === 'normal' }"
-            @click="$emit('update:workloadFilter', 'normal')"
+          class="workload-chip"
+          :class="{ active: workloadFilter === 'normal' }"
+          @click="!isLoading && $emit('update:workloadFilter', 'normal')"
         >Норма</div>
         <div
-            class="workload-chip"
-            :class="{ active: workloadFilter === 'free' }"
-            @click="$emit('update:workloadFilter', 'free')"
+          class="workload-chip"
+          :class="{ active: workloadFilter === 'free' }"
+          @click="!isLoading && $emit('update:workloadFilter', 'free')"
         >Свободны</div>
       </div>
 
-<!--       Поиск -->
       <div class="search-field">
         <span class="search-icon">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -71,71 +66,68 @@
           </svg>
         </span>
         <input
-            type="text"
-            class="search-input"
-            placeholder="Поиск..."
-            :value="search"
-            @input="$emit('update:search', $event.target.value)"
+          type="text"
+          class="search-input"
+          placeholder="Поиск..."
+          :value="search"
+          :disabled="isLoading"
+          @input="$emit('update:search', $event.target.value)"
         />
       </div>
     </div>
 
-<!--     Контент для вкладки "Задачи" -->
     <div v-else-if="activeTab === 'tasks'" class="tab-content">
-<!--       Фильтр по статусам -->
       <div class="task-filters">
         <div
-            class="task-filter-chip"
-            :class="{ active: taskStatusFilter === 'all' }"
-            @click="taskStatusFilter = 'all'"
+          class="task-filter-chip"
+          :class="{ active: taskStatusFilter === 'all' }"
+          @click="taskStatusFilter = 'all'"
         >Все статусы</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: taskStatusFilter === 'pending' }"
-            @click="taskStatusFilter = 'pending'"
+          class="task-filter-chip"
+          :class="{ active: taskStatusFilter === 'pending' }"
+          @click="taskStatusFilter = 'pending'"
         >Ожидает выполнения</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: taskStatusFilter === 'inProgress' }"
-            @click="taskStatusFilter = 'inProgress'"
+          class="task-filter-chip"
+          :class="{ active: taskStatusFilter === 'inProgress' }"
+          @click="taskStatusFilter = 'inProgress'"
         >Выполняется</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: taskStatusFilter === 'waiting' }"
-            @click="taskStatusFilter = 'waiting'"
+          class="task-filter-chip"
+          :class="{ active: taskStatusFilter === 'waiting' }"
+          @click="taskStatusFilter = 'waiting'"
         >Ждет контроля</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: taskStatusFilter === 'completed' }"
-            @click="taskStatusFilter = 'completed'"
+          class="task-filter-chip"
+          :class="{ active: taskStatusFilter === 'completed' }"
+          @click="taskStatusFilter = 'completed'"
         >Завершена</div>
       </div>
 
-<!--       Фильтр по дедлайнам -->
       <div class="task-filters">
         <div
-            class="task-filter-chip"
-            :class="{ active: deadlineFilter === 'all' }"
-            @click="deadlineFilter = 'all'"
+          class="task-filter-chip"
+          :class="{ active: deadlineFilter === 'all' }"
+          @click="deadlineFilter = 'all'"
         >Все дедлайны</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: deadlineFilter === 'overdue' }"
-            @click="deadlineFilter = 'overdue'"
+          class="task-filter-chip"
+          :class="{ active: deadlineFilter === 'overdue' }"
+          @click="deadlineFilter = 'overdue'"
         >Просрочено</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: deadlineFilter === 'today' }"
-            @click="deadlineFilter = 'today'"
+          class="task-filter-chip"
+          :class="{ active: deadlineFilter === 'today' }"
+          @click="deadlineFilter = 'today'"
         >Сегодня</div>
         <div
-            class="task-filter-chip"
-            :class="{ active: deadlineFilter === 'tomorrow' }"
-            @click="deadlineFilter = 'tomorrow'"
+          class="task-filter-chip"
+          :class="{ active: deadlineFilter === 'tomorrow' }"
+          @click="deadlineFilter = 'tomorrow'"
         >Завтра</div>
       </div>
 
-<!--       Поиск задач -->
       <div class="search-field">
         <span class="search-icon">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -143,15 +135,15 @@
           </svg>
         </span>
         <input
-            type="text"
-            class="search-input"
-            placeholder="Поиск задач..."
-            :value="taskSearch"
-            @input="$emit('update:taskSearch', $event.target.value)"
+          type="text"
+          class="search-input"
+          placeholder="Поиск..."
+          :value="taskSearch"
+          :disabled="isLoading"
+          @input="$emit('update:taskSearch', $event.target.value)"
         />
       </div>
 
-<!--       Заглушка: нет задач -->
       <div class="empty-tasks">
         <span class="empty-text">Нет задач</span>
       </div>
@@ -162,23 +154,20 @@
 <script setup>
 import { ref } from 'vue'
 
-// Пропсы
 defineProps({
   search: { type: String, default: '' },
   workloadFilter: { type: String, default: 'all' },
   taskSearch: { type: String, default: '' },
-  activeTab: { type: String, default: 'employees' }
+  activeTab: { type: String, default: 'employees' },
+  isLoading: { type: Boolean, default: false }
 })
 
-// События
 defineEmits(['update:search', 'update:workloadFilter', 'update:taskSearch', 'update:activeTab'])
 
-// Состояние фильтров
 const periodFilter = ref('today')
 const taskStatusFilter = ref('all')
 const deadlineFilter = ref('all')
 
-// Установка периода
 const setPeriod = (period) => {
   periodFilter.value = period
 }
@@ -195,6 +184,7 @@ const setPeriod = (period) => {
 .filter-tabs {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .filter-tab {
@@ -209,6 +199,11 @@ const setPeriod = (period) => {
 .filter-tab.active {
   border: 1px solid #3D3D3A;
   background: #EBEAE2;
+}
+
+.filter-tab.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .filter-tab-text {
@@ -229,6 +224,7 @@ const setPeriod = (period) => {
 .period-filters {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .period-chip {
@@ -314,6 +310,11 @@ const setPeriod = (period) => {
   opacity: 0.7;
 }
 
+.search-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .task-filters {
   display: flex;
   flex-wrap: wrap;
@@ -361,5 +362,38 @@ const setPeriod = (period) => {
   font-size: 16px;
   color: #3D3D3A;
   opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .filter-tab-text {
+    font-size: 16px;
+    line-height: 20px;
+  }
+  
+  .period-chip,
+  .workload-chip,
+  .task-filter-chip {
+    font-size: 14px;
+    line-height: 17px;
+  }
+  
+  .search-input {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-tabs {
+    gap: 10px;
+  }
+  
+  .filter-tab {
+    padding: 2px 6px;
+  }
+  
+  .filter-tab-text {
+    font-size: 14px;
+    line-height: 18px;
+  }
 }
 </style>
