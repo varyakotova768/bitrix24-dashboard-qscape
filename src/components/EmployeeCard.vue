@@ -123,9 +123,11 @@ const workloadClass = computed(() => {
   if (isAllWeekend.value) return 'workload-weekend'
   if (plannedHours.value === 0) return 'workload-free'
   const loadPercent = plannedHours.value / capacity.value
-  if (loadPercent > 1) return 'workload-overload'
-  if (loadPercent >= 0.8) return 'workload-normal'
-  return 'workload-free'
+  const normalLow = 0.93
+  const normalHigh = 1.07
+  if (loadPercent < normalLow) return 'workload-free'
+  if (loadPercent > normalHigh) return 'workload-overload'
+  return 'workload-normal'
 })
 
 const workloadLabel = computed(() => {

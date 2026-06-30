@@ -139,14 +139,19 @@ function computeEmployeeLoad(employee, from, to, timeFilter = 'all') {
   let loadStatus
   if (capacity === 0) {
     loadStatus = 'weekend'
-  } else if (plannedHours === 0) {
-    loadStatus = 'free'
   } else {
     const loadPercent = plannedHours / capacity
-    if (loadPercent > 1) loadStatus = 'overload'
-    else if (loadPercent >= 0.8) loadStatus = 'normal'
-    else loadStatus = 'free'
+    const NormalLow = 0.93
+    const NormalHigh = 1.07
+    if (loadPercent < NormalLow) {
+      loadStatus = 'free'
+    } else if (loadPercent > NormalHigh) {
+      loadStatus = 'overload'
+    } else {
+      loadStatus = 'normal'
+    }
   }
+
   return { plannedHours, capacity, loadStatus, tasksInPeriod }
 }
 
