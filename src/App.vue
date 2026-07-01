@@ -353,7 +353,7 @@ const periodLabel = computed(() => {
 })
 
 const tasksUnit = computed(() => {
-  return isTimeFilterActive.value ? 'не учитывается' : 'в выборке'
+  return isTimeFilterActive.value ? 'не учитывается' : 'за период'
 })
 
 const handleSync = loadData

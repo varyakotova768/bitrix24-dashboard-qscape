@@ -67,7 +67,7 @@ defineProps({
   stats: { type: Object, required: true },
   periodLabel: { type: String, default: 'за день' },
   noTimeCount: { type: Number, default: 0 },
-  tasksUnit: { type: String, default: 'всего' }
+  tasksUnit: { type: String, default: 'за период' }
 })
 </script>
 
